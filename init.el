@@ -1,8 +1,5 @@
 ;;; init.el --- Initialization file for Emacs -*- lexical-binding: t; -*-
 
-;; TODO: Lazytab
-;; TODO: Make avy use tex-parens-mark-sexp and similar in TeX-mode
-
 ;;; Bootstrapping
 
 ;; Straight package manager
@@ -64,8 +61,6 @@
   ;; indent with spaces
   (indent-tabs-mode nil)
   (tab-always-indent 'complete)
-  ;; Start on vterm
-  (initial-buffer-choice 'vterm)
   ;; Only warn when opening files above 100mb
   (large-file-warning-threshold (* 100 1000 1000))
   ;; Thin bar cursor
@@ -103,13 +98,6 @@
   (truncate-lines t)
   ;; Make sentences work normally
   (sentence-end-double-space nil)
-  ;; Smooth scrolling
-  (pixel-scroll-precision-mode t)
-  ;; Horizontal scrolling
-  (mouse-wheel-tilt-scroll t)
-  (mouse-wheel-flip-direction t)
-  (hscroll-margin 10)
-  (hscroll-step 1)
   ;; Keep the cursor out of the read-only portions of the minibuffer
   (minibuffer-prompt-properties '(read-only t
 				  intangible t
@@ -122,6 +110,11 @@
 						   (define-key input-decode-map
 							       (kbd "C-i")
 							       (kbd "H-i"))))))
+
+;; Special (read-only info) mode
+(use-package simple
+  :straight (:type built-in)
+  :hook (special-mode . visual-line-mode))
 
 ;; File system
 (use-package files
@@ -142,8 +135,7 @@
 ;;; Appearance
 
 ;; Theme
-(use-package monokai-pro-theme
-  :init (load-theme 'monokai-pro))
+(load-theme 'modus-vivendi)
 
 ;; Minimal mode line
 (use-package mood-line
@@ -227,50 +219,23 @@
   (global-auto-revert-ignore-modes '(Buffer-menu-mode)))
 
 ;; Frames only (use window manager instead)
-;; (use-package frames-only-mode
-;;   :init
-;;   ;; Activate
-;;   (frames-only-mode +1)
-;;   ;; Rebind C-x 2, etc
-;;   (frames-only-mode-remap-common-window-split-keybindings))
+(use-package frames-only-mode
+  :init
+  ;; Activate
+  (frames-only-mode +1)
+  ;; Rebind C-x 2, etc
+  (frames-only-mode-remap-common-window-split-keybindings))
 
 ;; Better undo
 (use-package undo-fu
   :bind (("C-z" . undo-fu-only-undo)
 	 ("C-S-z" . undo-fu-only-redo)))
 
-;; Fast navigation and shortcut actions
-(use-package avy
-  :bind (("H-i" . avy-goto-char-2) ; C-i
-	 :map isearch-mode-map
-	 ("H-i" . avy-isearch))
-  :custom-face (avy-background-face ((t :inherit shadow)))
-  :custom
-  ;; Use colemak home row
-  (avy-keys '(?n ?t ?e ?s ?i ?r ?o ?a))
-  ;; Rebind action keys
-  (avy-dispatch-alist '((?k . avy-action-kill-move)
-                        (?K . avy-action-kill-stay)
-                        (?m . avy-action-mark)
-                        (?c . avy-action-copy)
-                        (?y . avy-action-yank)
-                        (?Y . avy-action-yank-line)
-                        (?l . avy-action-ispell)
-                        (?z . avy-action-zap-to-char)))
-  ;; Dim other text when selecting match
-  (avy-background t)
-  ;; Allow shortcuts on single match
-  (avy-single-candidate-jump nil)
-  :config
-  ;; Let closer matches be shallower in selection tree
-  (add-to-list 'avy-orders-alist '(avy-goto-char-2 . avy-order-closest)))
-
-
-
 ;; Selectively make modeline invisible
 (use-package hide-mode-line
   :after vterm
   :hook vterm-mode)
+
 
 ;;; Vert&co
 
@@ -343,7 +308,14 @@
 ;; LSP
 (use-package eglot
   :straight (:type built-in)
-  :hook ((python-mode) . eglot-ensure))
+  :hook ((python-mode scala-mode) . eglot-ensure))
+
+;; Eldoc documentation buffer
+(use-package eldoc
+  :straight (:type built-in)
+  :custom
+  ;; Don't use echo area if the eldoc buffer is visible
+  (eldoc-echo-area-prefer-doc-buffer t))
 
 ;; Inline completion
 (use-package corfu
@@ -378,27 +350,6 @@
 		      discard ; Careful if not delete-by-moving-to-trash
 		      trash)))
 
-;; Fast terminal emulator
-(use-package vterm
-  :bind (("C-c T" . vterm)
-	 ("C-c t" . vterm-other-window)
-	 :map vterm-mode-map
-	 ("C-y" . vterm-yank)
-         ("M-0" . winum-select-window-0-or-10)
-         ("M-1" . winum-select-window-1)
-         ("M-2" . winum-select-window-2)
-         ("M-3" . winum-select-window-3)
-         ("M-4" . winum-select-window-4)
-         ("M-5" . winum-select-window-5)
-         ("M-6" . winum-select-window-6)
-         ("M-7" . winum-select-window-7)
-         ("M-8" . winum-select-window-8)
-         ("M-9" . winum-select-window-9))
-  :custom
-  ;; Completely clear terminal on 'C-l'
-  (vterm-clear-scrollback-when-clearing t))
-
-
 ;;; Language major modes
 
 (use-package org
@@ -416,9 +367,6 @@
   (org-babel-python-command "uv run python3")
   ;; Run source blocks without confirmation
   (org-confirm-babel-evaluate nil))
-
-(use-package org-roam)
-
 
 ;; Agda 2.8.0
 (use-package agda2
@@ -482,10 +430,7 @@
 (use-package haskell-mode)
 
 ;; Scala
-(use-package scala-ts-mode
-  :custom
-  ;; Syntax highlighting
-  (treesit-font-lock-level 4))
+(use-package scala-mode)
 
 
 ;; Python ide features

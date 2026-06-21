@@ -127,7 +127,7 @@ Reset VAR to its value at time of calling on HOOK"
 				    (left   . 0.5)
 				    (top    . 0.3)
 				    ;; Font
-				    (font . "JuliaMono-12")
+				    (font . "CascadiaMonoNF-12")
 				    ;; Menu bar
 				    (menu-bar-lines . 0)
 				    ;; Borders
