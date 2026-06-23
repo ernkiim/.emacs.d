@@ -432,6 +432,8 @@
 ;; Scala
 (use-package scala-mode)
 
+;; Racket
+(use-package racket-mode)
 
 ;; Python ide features
 (use-package python
