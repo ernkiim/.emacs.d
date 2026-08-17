@@ -135,7 +135,7 @@
 ;;; Appearance
 
 ;; Theme
-(load-theme 'modus-vivendi)
+(load-theme 'manoj-dark)
 
 ;; Minimal mode line
 (use-package mood-line
@@ -233,8 +233,8 @@
 
 ;; Selectively make modeline invisible
 (use-package hide-mode-line
-  :after vterm
-  :hook vterm-mode)
+  :after pdf-tools
+  :hook pdf-view-mode)
 
 
 ;;; Vert&co
@@ -362,7 +362,8 @@
   ;; Org source block languages
   (org-babel-load-languages '((emacs-lisp . t)
                               (haskell . t)
-                              (python . t)))
+                              (python . t)
+                              (java . t)))
   ;; Org python
   (org-babel-python-command "uv run python3")
   ;; Run source blocks without confirmation
@@ -472,7 +473,11 @@
 ;; PDF interaction
 (use-package pdf-tools
   :magic ("%PDF" . pdf-view-mode)
-  :hook ((pdf-view-mode . pdf-view-themed-minor-mode))
+  :hook ((pdf-view-mode . pdf-view-themed-minor-mode)
+         (pdf-view-mode . pdf-view-roll-minor-mode))
+  :custom
+  ;; Slow when on
+  (pdf-view-use-scaling nil)
   :config
   ;; Initialize
   (pdf-tools-install :no-query)
