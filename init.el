@@ -46,8 +46,6 @@
   :bind (("C-M-y" . up-list)
 	 ("C-M-w" . delete-pair)
 	 ("M-o" . other-window)
-	 ("C-<wheel-up>" . nil) ; Smooth scroll can trigger these bindings
-	 ("C-<wheel-down>" . nil)
 	 ("C-c a" . copy-from-above-command))
   :config
   ;; Separate 'C-i' from 'TAB' binding by sending 'C-i' to 'H-i'
@@ -58,6 +56,8 @@
   (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file 'noerror t)
   :custom
+  ;; Scroll left and right with touchpad
+  (mouse-wheel-tilt-scroll t)
   ;; indent with spaces
   (indent-tabs-mode nil)
   (tab-always-indent 'complete)
@@ -137,6 +137,11 @@
 ;; Theme
 (load-theme 'manoj-dark)
 
+;; Built-in pixelwise scrolling
+(use-package pixel-scroll
+  :straight (:type built-in)
+  :init (pixel-scroll-precision-mode +1))
+
 ;; Minimal mode line
 (use-package mood-line
   :init (mood-line-mode +1)
@@ -162,7 +167,6 @@
      ((mood-line-segment-vc)         . "  ")
      ((mood-line-segment-major-mode) . "  ")
      ((mood-line-segment-checker)    . "  ")))))
-
 
 ;;; UX
    
