@@ -1,19 +1,13 @@
 ;;; early-init.el --- Loads before UI elements -*- lexical-binding: t; -*-
 
-(defun setq-until (var val hook &optional default)
-  "Set VAR equal to VAL temporarily. Use setq-default if DEFAULT
-Reset VAR to its value at time of calling on HOOK"
-  (let ((prev (eval var)))
-    (defun reset ()
-      (if default
-	  (setq-default var val)
-	(setq var val))
-      (remove-hook hook 'reset)))
-  (setq var val)
-  (add-hook hook 'reset))
-
-(defun setq-until-startup (var val)
-  (setq-until var val 'emacs-startup-hook t))
+(defun set-until (hook var val &optional final-val)
+  "Set VAR equal to VAL temporarily.
+Reset VAR to its value at time of calling on HOOK.
+Reset VAR to FINAL-VAL instead if provided."
+  (unless final-val (setq final-val (eval var)))
+  (set var val)
+  (add-hook hook (lambda ()
+                   (set var final-val))))
 
 ;; Debug
 (setq debug-on-error init-file-debug)
@@ -22,11 +16,11 @@ Reset VAR to its value at time of calling on HOOK"
 ;;; Performance
 
 ;; Defer garbage collection
-(setq-until-startup 'gc-cons-threshold most-positive-fixnum)
-(setq-until-startup 'gc-cons-percentage 0.6)
+(set-until 'emacs-startup-hook 'gc-cons-threshold most-positive-fixnum (* 50 1000 1000))
+(set-until 'emacs-startup-hook 'gc-cons-percentage 0.6)
 
 ;; Disable special file handlers during initialization
-(setq-until-startup 'file-name-handler-alist nil)
+(set-until 'emacs-startup-hook 'file-name-handler-alist nil)
 
 ;; Disable mode line (mood-line will replace it)
 (setq-default mode-line-format nil)
@@ -52,10 +46,9 @@ Reset VAR to its value at time of calling on HOOK"
   ;; Debug
   (when (not init-file-debug)
     ;; Don't redraw until something actually happens
-    (setq-until 'inhibit-redisplay t 'post-command-hook t)
-
+    (set-until 'post-command-hook 'inhibit-redisplay t)
     ;; Don't display messages during startup
-    (setq-until 'inhibit-message t 'post-command-hook t))
+    (set-until 'post-command-hook 'inhibit-message t))
 
   ;; A second, case-insensitive pass over `auto-mode-alist' is time wasted.
   ;; No second pass of case-insensitive search over auto-mode-alist.
@@ -109,6 +102,9 @@ Reset VAR to its value at time of calling on HOOK"
 
 
 ;;; UI
+
+;; Load (built-in) theme here to avoid flicker
+(load-theme 'manoj-dark)
 
 ;; Auto focus new frames
 (add-hook 'after-make-frame-functions 'select-frame-set-input-focus)

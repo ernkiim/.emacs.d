@@ -58,6 +58,8 @@
   :custom
   ;; Scroll left and right with touchpad
   (mouse-wheel-tilt-scroll t)
+  ;; Don't always center cursor when scrolling off screen
+  (scroll-conservatively 3)
   ;; indent with spaces
   (indent-tabs-mode nil)
   (tab-always-indent 'complete)
@@ -134,14 +136,6 @@
 
 ;;; Appearance
 
-;; Theme
-(load-theme 'manoj-dark)
-
-;; Built-in pixelwise scrolling
-(use-package pixel-scroll
-  :straight (:type built-in)
-  :init (pixel-scroll-precision-mode +1))
-
 ;; Minimal mode line
 (use-package mood-line
   :init (mood-line-mode +1)
@@ -185,7 +179,8 @@
   :straight (:type built-in)
   :init (electric-pair-mode +1)
   :custom
-  (electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
+  ;; Don't skip over the closing delim
+  (electric-pair-skip-self nil))
 
 ;; Save position in files
 (use-package saveplace
@@ -236,10 +231,7 @@
 	 ("C-S-z" . undo-fu-only-redo)))
 
 ;; Selectively make modeline invisible
-(use-package hide-mode-line
-  :after pdf-tools
-  :hook pdf-view-mode)
-
+(use-package hide-mode-line)
 
 ;;; Vert&co
 
@@ -477,8 +469,8 @@
 ;; PDF interaction
 (use-package pdf-tools
   :magic ("%PDF" . pdf-view-mode)
-  :hook ((pdf-view-mode . pdf-view-themed-minor-mode)
-         (pdf-view-mode . pdf-view-roll-minor-mode))
+  :hook ((pdf-view-mode . pdf-view-roll-minor-mode)
+         (pdf-view-mode . pdf-view-themed-minor-mode))
   :custom
   ;; Slow when on
   (pdf-view-use-scaling nil)
