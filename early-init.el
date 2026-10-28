@@ -174,7 +174,7 @@ Reset VAR to FINAL-VAL instead if provided."
 (set-language-environment "UTF-8")
 (setq default-input-method nil)
 
-;; Don't load packages before init
+;; Don't load packages before init (need for straight.el)
 (setq package-enable-at-startup nil)
 
 ;; Security

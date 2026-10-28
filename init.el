@@ -313,6 +313,9 @@
   ;; Don't use echo area if the eldoc buffer is visible
   (eldoc-echo-area-prefer-doc-buffer t))
 
+;; Terminal emulator
+(use-package ghostel)
+
 ;; Inline completion
 (use-package corfu
   :after orderless
@@ -372,6 +375,15 @@
   (lambda ()
     (file-name-directory (shell-command-to-string "agda --emacs-mode locate"))))
 
+;; C-like 
+(use-package cc-mode
+  :straight (:type built-in)
+  :custom
+  ;; Set styles per language
+  (c-default-style '((awk-mode . "awk")
+                     (other . "gnu")))
+  )
+
 ;; Lean4
 (use-package nael
   :hook ((nael-mode . abbrev-mode)
@@ -406,8 +418,11 @@
 		       ;; Use my fork
 		       :fork (:host github
 				    :repo "ernkiim/cdlatex"))
-
     :custom
+    ;; Extra math mode info
+    (texmathp-tex-commands '(("mathpar"      env-on)
+                             ("\\inferrule"   arg-on)
+                             ("\\inferrule*"  arg-on)))
     ;; Turn off labels
     (cdlatex-insert-auto-labels-in-env-templates nil)
     ;; Use electric pairs
@@ -454,6 +469,8 @@
    ;; Hide unwanted file names
    (dired-mode . dired-omit-mode))
   :custom
+  ;; Drag and drop files with mouse
+  (dired-mouse-drag-files t)
   ;; Target the directory shown in another dired buffer
   (dired-dwim-target t)
   ;; Don't hide symlink targets
